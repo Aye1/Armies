@@ -1,30 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class ArmyBase : MonoBehaviour {
+public class ArmyBase : AttackableEntity {
 
     public Soldier soldier;
     public GameObject spawn;
     public GameObject soldierContainer;
+    public ArmyBase enemyBase;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public override void Init()
+    {
+    }
 
     public void SendSoldier()
     {
         Soldier newSoldier = Instantiate(soldier);
-        newSoldier.faction = Soldier.Faction.Fac2;
+        newSoldier.gameObject.SetActive(true);
+        newSoldier.faction = faction;
         newSoldier.transform.position = spawn.transform.position;
         newSoldier.transform.SetParent(soldierContainer.transform);
         newSoldier.transform.localScale = Vector3.one;
-
+        newSoldier.SetGoal(enemyBase.transform.position);
     }
 }

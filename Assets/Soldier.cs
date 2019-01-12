@@ -4,158 +4,74 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
-public class Soldier : MonoBehaviour {
+public class Soldier : AttackableEntity {
 
-    public enum Faction { Fac1, Fac2 };
     private static Color Fac1Color = Color.red;
     private static Color Fac2Color = Color.blue;
 
     public Stack<Vector3> goals;
     public float maxDistanceDelta = 0.1f;
-    public int maxHP = 100;
-    public int currentHP = 100;
-    public List<Soldier> targets;
-    public List<Soldier> nearbyAllies;
-    public Faction faction;
+    public float attackDelay = 1.0f;
+    public List<AttackableEntity> nearbyAllies;
 
-    private Lifebar lifebar;
+    private float _nextTimeAttack;
 
-	// Use this for initialization
-	void Start () {
-        goals = new Stack<Vector3>();
-        goals.Push(new Vector3(0.0f, 0.0f, transform.position.z));
-        targets = new List<Soldier>();
-        lifebar = GetComponentInChildren<Lifebar>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        MoveTowardsGoal();
-        UpdateLifeBar();
-        UpdateSoldierColor();
+
+    public override void Init()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update () {
+        //MoveTowardsGoal();
+        //UpdateLifeBar();
+        //UpdateSoldierColor();
+        ManageMove();
+        ManageFight();
 	}
 
-    private void MoveTowardsGoal()
+    public void SetGoal(Vector3 goal)
     {
-        if (goals != null && goals.Count > 0 && targets.Count == 0)
+        if(goals == null)
         {
-            Vector3 goal = goals.Peek();
-            if (!IsAtGoal(goal))
-            {
-                if (IsAllyAhead(goal))
-                {
-                    Debug.Log("Ally ahead");
-                }
-                Vector3 nextPosition = FindNextPosition(goal);
-                Debug.DrawLine(transform.position, nextPosition);
-                transform.position = new Vector3(nextPosition.x, nextPosition.y, transform.position.z);
-            }
-            else
-            {
-                Debug.Log("Goal reached, popping");
-                goals.Pop();
-            }
+            goals = new Stack<Vector3>();
+        }
+        goals.Push(goal);
+    }
+
+    private void ManageMove()
+    { 
+        GetComponentInChildren<MoveWithNavMesh>().CanMove = targets.Count == 0;
+        if(goals.Count > 0)
+        {
+            GetComponentInChildren<MoveWithNavMesh>().destination = goals.Peek();
         }
     }
 
-    private Vector3 FindNextPosition(Vector3 goal, int depth=0)
+    private void ManageFight()
     {
-        Debug.Log("Finding next position - Depth " + depth.ToString());
-        if(depth >= 10)
+        if(CanAttack())
         {
-            Debug.Log("Could not find next position");
-            return transform.position;
-        }
-        Vector3 nextPosition = Vector3.MoveTowards(transform.position, goal, maxDistanceDelta);
-        if(CanGoToPosition(nextPosition))
-        {
-            return nextPosition;
-        }
-
-       /*Vector3 move = nextPosition - transform.position;
-        Vector3 leftPos = Quaternion.Euler(0.0f, 0.0f, -45.0f) * move + transform.position; 
-       //Vector3 rightPos = Quaternion.Euler(0.0f, 0.0f, 45.0f) * move;
-        if(CanGoToPosition(leftPos))
-        {
-            return leftPos;
-        }
-        /*if (CanGoToPosition(rightPos))
-        {
-            return rightPos;
-        }
-        return FindNextPosition(leftPos, depth+1);*/
-        return transform.position;
-    }
-
-    private bool CanGoToPosition(Vector3 pos)
-    {
-        bool canGoToNextPosition = true;
-        foreach (Soldier s in nearbyAllies)
-        {
-            if (Vector3.Distance(s.transform.position, pos) <= 10)
-            {
-                canGoToNextPosition = false;
-            }
-        }
-        return canGoToNextPosition;
-    }
-
-    private bool IsAtGoal(Vector3 goal)
-    {
-        return Vector3.Distance(goal, transform.position) < Mathf.Epsilon;
-    }
-
-    private bool IsAllyAhead(Vector3 goal)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector3.Normalize(goal - transform.position), 3.0f);
-        if(hit.collider != null)
-        {
-            Debug.Log(hit.collider.gameObject.name);
-            GameObject obj = hit.collider.gameObject;
-            Soldier otherSoldier = obj.GetComponent<Soldier>();
-            if(otherSoldier != null && otherSoldier.faction == faction)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void FindIntermediateGoal()
-    {
-
-    }
-
-
-    public void Damage(int dmg)
-    {
-        if (currentHP - dmg <= 0)
-        {
-            Die();
-        }
-        else
-        {
-            currentHP -= dmg;
+            Attack();
         }
     }
 
-    public void Die()
+    private bool CanAttack()
     {
-        Destroy(gameObject);
+        return targets.Count > 0 && Time.time > _nextTimeAttack;
     }
 
-    private void UpdateLifeBar()
+    private void Attack()
     {
-        if (lifebar != null)
-        {
-            lifebar.CurrentHealth = currentHP;
-        }
+        targets.ToArray()[0].Damage(10);
+        _nextTimeAttack = Time.time + attackDelay;
     }
 
-    private void UpdateSoldierColor()
+    /*private void UpdateSoldierColor()
     {
         GetComponent<Image>().color = faction == Faction.Fac1 ? Fac1Color : Fac2Color;
-    }
+    }*/
 
 
 #if UNITY_EDITOR
