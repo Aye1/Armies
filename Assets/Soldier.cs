@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEditor;
 
 public class Soldier : AttackableEntity {
@@ -17,15 +15,13 @@ public class Soldier : AttackableEntity {
     private float _nextTimeAttack;
 
 
-    public override void Init()
+    protected override void Init()
     {
 
     }
 
     // Update is called once per frame
-    void Update () {
-        //MoveTowardsGoal();
-        //UpdateLifeBar();
+    protected override void SpecificUpdate () {
         //UpdateSoldierColor();
         ManageMove();
         ManageFight();
@@ -43,7 +39,7 @@ public class Soldier : AttackableEntity {
     private void ManageMove()
     { 
         GetComponentInChildren<MoveWithNavMesh>().CanMove = targets.Count == 0;
-        if(goals.Count > 0)
+        if(goals != null && goals.Count > 0)
         {
             GetComponentInChildren<MoveWithNavMesh>().destination = goals.Peek();
         }

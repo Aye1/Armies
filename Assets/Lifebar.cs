@@ -25,6 +25,22 @@ public class Lifebar : MonoBehaviour {
         }
     }
 
+    public int MaxHealth
+    {
+        get
+        {
+            return _maxHealth;
+        }
+        set
+        {
+            if (_maxHealth != value && value >= 0)
+            {
+                _maxHealth = value;
+                ComputeBarSize();
+            }
+        }
+    }
+
 
     // Use this for initialization
     void Start () {

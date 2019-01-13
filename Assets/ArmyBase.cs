@@ -6,8 +6,14 @@ public class ArmyBase : AttackableEntity {
     public GameObject spawn;
     public GameObject soldierContainer;
     public ArmyBase enemyBase;
+    public Material soldierMaterial;
 
-    public override void Init()
+    protected override void Init()
+    {
+        FindObjectOfType<LifebarManager>().AddEntity(this);
+    }
+
+    protected override void SpecificUpdate()
     {
     }
 
@@ -18,7 +24,12 @@ public class ArmyBase : AttackableEntity {
         newSoldier.faction = faction;
         newSoldier.transform.position = spawn.transform.position;
         newSoldier.transform.SetParent(soldierContainer.transform);
-        newSoldier.transform.localScale = Vector3.one;
-        newSoldier.SetGoal(enemyBase.transform.position);
+        //newSoldier.transform.localScale = Vector3.one;
+        newSoldier.GetComponent<MeshRenderer>().material = soldierMaterial;
+        if (enemyBase != null)
+        {
+            newSoldier.SetGoal(enemyBase.transform.position);
+        }
+        FindObjectOfType<LifebarManager>().AddEntity(newSoldier);
     }
 }

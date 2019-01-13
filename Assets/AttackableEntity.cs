@@ -6,7 +6,7 @@ public abstract class AttackableEntity : MonoBehaviour {
 
     public enum Faction { Fac1, Fac2 };
     public int maxHP = 100;
-    public int _currentHP = 100;
+    private int _currentHP = 100;
     public Faction faction;
     public List<AttackableEntity> attackers;
     public List<AttackableEntity> targets;
@@ -15,7 +15,7 @@ public abstract class AttackableEntity : MonoBehaviour {
 
     protected Lifebar _lifebar;
 
-    protected int CurrentHP
+    public int CurrentHP
     {
         get { return _currentHP; }
         set { 
@@ -27,7 +27,8 @@ public abstract class AttackableEntity : MonoBehaviour {
         }
     }
 
-    public abstract void Init();
+    protected abstract void Init();
+    protected abstract void SpecificUpdate();
 
     // Use this for initialization
     void Start () {
@@ -36,6 +37,12 @@ public abstract class AttackableEntity : MonoBehaviour {
         _lifebar = GetComponentInChildren<Lifebar>();
         UpdateLifeBar();
         Init();
+    }
+
+    private void Update()
+    {
+        CheckTargets();
+        SpecificUpdate();
     }
 
     public void Damage(int dmg)
@@ -60,6 +67,7 @@ public abstract class AttackableEntity : MonoBehaviour {
         {
             s.attackers.Remove(this);
         }
+        FindObjectOfType<LifebarManager>().RemoveEntity(this);
         Destroy(gameObject);
     }
 
@@ -68,6 +76,17 @@ public abstract class AttackableEntity : MonoBehaviour {
         if (_lifebar != null)
         {
             _lifebar.CurrentHealth = CurrentHP;
+        }
+    }
+
+    private void CheckTargets()
+    {
+        foreach(AttackableEntity entity in targets)
+        {
+            if (entity == null)
+            {
+                targets.Remove(entity);
+            }
         }
     }
 }
