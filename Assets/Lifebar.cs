@@ -7,7 +7,7 @@ public class Lifebar : MonoBehaviour {
 
     private int _maxHealth = 100;
     private int _currentHealth;
-    public SpriteRenderer currentHealthImage;
+    public GameObject currentHealthImage;
 
     public int CurrentHealth
     {

@@ -64,7 +64,8 @@ public class LifebarManager : MonoBehaviour {
 
     private void SetLifebarPosition(AttackableEntity entity, Lifebar lb)
     {
-        Vector3 offset = new Vector3(0.0f, 5.0f, 0.70f);
-        lb.transform.position = entity.transform.position + offset;
+        Vector3 offset = new Vector3(0.0f, 5.0f, 0.5f);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(entity.transform.position + offset);
+        lb.transform.position = screenPos;
     }
 }
