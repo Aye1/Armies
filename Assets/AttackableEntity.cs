@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public abstract class AttackableEntity : MonoBehaviour {
 
@@ -81,12 +82,14 @@ public abstract class AttackableEntity : MonoBehaviour {
 
     private void CheckTargets()
     {
+        List<AttackableEntity> targetsToRemove = new List<AttackableEntity>();
         foreach(AttackableEntity entity in targets)
         {
             if (entity == null)
             {
-                targets.Remove(entity);
+                targetsToRemove.Add(entity);
             }
         }
+        targets = targets.Except(targetsToRemove).ToList();
     }
 }

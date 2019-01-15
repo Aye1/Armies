@@ -41,8 +41,20 @@ public class Soldier : AttackableEntity {
         GetComponentInChildren<MoveWithNavMesh>().CanMove = targets.Count == 0;
         if(goals != null && goals.Count > 0)
         {
-            GetComponentInChildren<MoveWithNavMesh>().destination = goals.Peek();
+            Vector3 goal = goals.Peek();
+            GetComponentInChildren<MoveWithNavMesh>().destination = goal;
+            if(IsAtGoal(goal)) 
+            {
+                goals.Pop(); 
+            }
         }
+    }
+
+    private bool IsAtGoal(Vector3 goal)
+    {
+        Vector3 projectGoal = new Vector3(goal.x, transform.position.y, goal.z);
+        float dist = Vector3.Distance(projectGoal, transform.position);
+        return dist < 0.2f;
     }
 
     private void ManageFight()

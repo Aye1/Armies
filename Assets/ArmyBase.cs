@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 public class ArmyBase : AttackableEntity {
 
@@ -16,6 +17,7 @@ public class ArmyBase : AttackableEntity {
     protected override void SpecificUpdate()
     {
     }
+
 
     public void SendSoldier()
     {
